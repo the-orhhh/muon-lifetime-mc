@@ -48,8 +48,8 @@ fn ray_intersects_rotated_cylinder(x: f64, y: f64, radius: f64, height: f64, the
 fn calculate_effective_area(radius: f64, height: f64, num_samples: usize, rng: &mut impl Rng) -> f64 {
     let theta = sample_cos2(rng);
     
-    let max_extent_x = radius * 1.5;
-    let max_extent_y = (radius + height * 0.5) * 1.5;
+    let max_extent_x = radius;
+    let max_extent_y = (radius.powi(2) + height.powi(2) * 0.25).sqrt();
     let sampling_area = (2.0 * max_extent_x) * (2.0 * max_extent_y);
     
     let mut hits = 0;
@@ -66,6 +66,8 @@ fn calculate_effective_area(radius: f64, height: f64, num_samples: usize, rng: &
 }
 
 fn main() {
+    use std::time::Instant;
+    let now = Instant::now();
     let args: Vec<String> = std::env::args().collect();
     if args.len() != 3 {
         eprintln!("Error: Expected exactly 2 arguments (radius and height)");
@@ -86,7 +88,7 @@ fn main() {
     println!("Radius: {}, Height: {}", radius, height);
     
     let mut rng = rand::rng();
-    let num_samples = 100_000;
+    let num_samples = 100_000_000;
     
     println!("Running {} Monte Carlo samples...", num_samples);
     
@@ -95,4 +97,6 @@ fn main() {
     println!("\nResults:");
     println!("Effective Area: {:.6}", effective_area);
     println!("Geometric Area (πr²): {:.6}", std::f64::consts::PI * radius * radius);
+    let elapsed = now.elapsed();
+    println!("Elapsed: {:.2?}", elapsed);
 }
